@@ -59,6 +59,7 @@ register_parser.add_argument("username", type=str, help='user_name must be a str
 user_parser = reqparse.RequestParser()
 user_parser.add_argument("username", type=str, help='user_name must be a string')
 user_parser.add_argument("email", type=str, help='Email must be a string')
+user_parser.add_argument("password", type=str, help='Password must be a string')
 
 post_parser = reqparse.RequestParser()
 post_parser.add_argument("id", type=int, help='Id must be an integer')
@@ -94,22 +95,20 @@ class User(Resource):
     def get(self, user_id):
         if user_id == 999:
             return UserModel.query.all()
-        args = user_parser.parse_args()
         user = UserModel.query.filter_by(id=user_id).first()
-        return user, args
+        return user
 
-    @marshal_with(resource_user)
+    # @marshal_with(resource_user)
     # @jwt_required()
     def post(self, user_id):
         args = user_parser.parse_args()
-        password = generate_password_hash(args['password'])
-        user = UserModel(username=args['password'], email=args['email'])
-        #user = UserModel(id=user_id, username=args['username'], email=args['email'], password=password)
+        # password = generate_password_hash(args['password'])  not working???
+        user = UserModel(username=args["username"], email=args["email"], password=args['password'])
         db.session.add(user)
         db.session.commit()
         return f"Bartender {user_id} added"
 
-    @marshal_with(resource_user)
+    # @marshal_with(resource_user)
     @jwt_required()
     def put(self, user_id):
         args = user_parser.parse_args()
@@ -140,7 +139,7 @@ class Post(Resource):
         post = PostModel.query.filter_by(id=item_id).first()
         return post
 
-    @marshal_with(resource_posts)
+    # @marshal_with(resource_posts)
     # @jwt_required()
     def post(self, item_id):
         args = post_parser.parse_args()
@@ -149,7 +148,7 @@ class Post(Resource):
         db.session.commit()
         return f"Poison {item_id} recipe added"
 
-    @marshal_with(resource_posts)
+    # @marshal_with(resource_posts)
     @jwt_required()
     def put(self, item_id):
         args = post_parser.parse_args()

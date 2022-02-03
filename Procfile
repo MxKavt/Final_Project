@@ -1,1 +1,1 @@
-web: uwsgi uwsgi.ini
+web: gunicorn  poison_bar:app

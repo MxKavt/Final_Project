@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse, fields, marshal_with
@@ -68,6 +68,11 @@ post_parser.add_argument("recipe", type=str, help='Recipe must be a string')
 post_parser.add_argument("user_id", type=int, help='user_id must be an integer')
 
 
+class Home(Resource):
+    def get(self):
+        return redirect("https://github.com/MxKavt/Final_Project")
+
+
 class Auth(Resource):
     def post(self):
         email = request.json.get("email", None)
@@ -88,6 +93,8 @@ class Register(Resource):
         db.session.add(user)
         db.session.commit()
         return {"msg": "bartender user created"}, 201
+
+
 
 
 class User(Resource):
@@ -172,6 +179,7 @@ class Post(Resource):
 
 
 api.add_resource(Register, '/register')
+api.add_resource(Home, '/')
 api.add_resource(Auth, '/login')
 api.add_resource(User, '/user/<int:user_id>')
 api.add_resource(Post, '/item/<int:item_id>')
